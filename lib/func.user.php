@@ -45,6 +45,7 @@ function user_process_login($vars){
 	setcookie("app_pass", md5($vars['pass']), time()+(3600*24),"/");
 	
 	$ret['status']=1;
+	$ret['is_admin'] = $items[0]['is_admin'];
 	$ret['error']='';
 	return $ret;
 }
@@ -57,10 +58,21 @@ function user_process_signup($vars){
 	
 	$vars['email']=trim(strtolower($vars['email']));
 	
+	// regular expression to check email syntax
+	$pattern = "/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}[a-z.]*$/";
+
+
+
     if (strlen($ret['error'])==0 and strlen($vars['email'])==0) {
         $ret['error']=LANG_YOU_NEED_TO_PROVIDE_EMAIL;
         return $ret;
     }
+
+	if(!preg_match($pattern, $vars['email'])){
+		$ret['error']="Enter valid email!";
+        return $ret;
+	}
+
     if (strlen($ret['error'])==0 and strlen($vars['name'])==0) {
         $ret['error']="You need to type in your name.";
         return $ret;
@@ -87,6 +99,36 @@ function user_process_signup($vars){
 	
 	$ret['status']=1;
 	$ret['error']='';
+	return $ret;
+}
+
+function calc_KPIs(){
+	global $db;
+
+	$users = $db->query("SELECT * FROM users")->fetchAll();
+	$ret['users_num'] = count($users);
+
+	$items = $db->query("SELECT * FROM items")->fetchAll();
+	$ret['users_num'] = count($items);
+
+	$pending_items = $db->query("SELECT * FROM items WHERE status = pending")->fetchAll();
+	$ret['users_num'] = count($pending_items);
+
+	$completed_items = $db->query("SELECT * FROM items WHERE status = completed")->fetchAll();
+	$ret['users_num'] = count($completed_items);
+
+	return $ret;
+}
+
+function KPI_per_user($id){
+	global $db;
+
+	$pending_items = $db->query("SELECT * FROM items WHERE user_id = ? AND status = pending", $id)->fetchAll();
+	$ret['users_num'] = count($pending_items);
+
+	$completed_items = $db->query("SELECT * FROM items WHERE user_id = ? AND status = completed", $id)->fetchAll();
+	$ret['users_num'] = count($completed_items);
+
 	return $ret;
 }
 

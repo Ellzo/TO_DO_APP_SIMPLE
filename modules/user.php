@@ -32,13 +32,15 @@ switch($vars['action']){
          $ret=user_process_login($vars);
         print_r($ret); 
          if ($ret['status']==1){
-            header("location: index.php?action=list"); 
+            if($ret['is_admin'])
+               header("location: view/admin/admin.header.php?action=list");
+            else
+               header("location: index.php?action=list"); 
          }else{
             header("location: index.php?action=login&error_message=".urlencode($ret['error']));
          }
          exit;        
     }break;    
-    
     case "logout":{
 	    setcookie("app_email", "" , -1,"/");
 	    setcookie("app_pass", "", -1,"/");        

@@ -12,3 +12,6 @@ ALTER TABLE `items`
 ALTER TABLE `items`
   MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
+
+ALTER TABLE `items` ADD user_id int(11) NOT NULL;
+
